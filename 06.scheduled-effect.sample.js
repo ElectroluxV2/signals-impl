@@ -1,4 +1,4 @@
-import { computed, effect, signal } from './05.sorted-effect.js';
+import { computed, effect, signal } from './06.scheduled-effect.js';
 
 const reactiveNumber = signal(1);
 const reactiveParity = computed(() => reactiveNumber.get() % 2 === 0 ? 'even' : 'odd');
@@ -9,3 +9,8 @@ effect(() =>
 
 reactiveNumber.set(2);
 reactiveNumber.set(3);
+
+await new Promise(r => setTimeout(r, 0))
+
+reactiveNumber.set(4);
+reactiveNumber.set(5);
