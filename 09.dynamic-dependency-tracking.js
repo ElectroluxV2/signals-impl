@@ -6,25 +6,29 @@ export const signal = (initialValue) => {
   let value = initialValue;
   const subscribers = new Set();
 
-  return {
-    get: () => {
-      if (signalsSystem.currentSubscriber) {
-        const temp = signalsSystem.currentSubscriber.notify;
-        signalsSystem.currentSubscriber.addDependency(() => subscribers.delete(temp));
-        subscribers.add(temp);
-      }
+  const get = () => {
+    if (signalsSystem.currentSubscriber) {
+      const temp = signalsSystem.currentSubscriber.notify;
+      signalsSystem.currentSubscriber.addDependency(() => subscribers.delete(temp));
+      subscribers.add(temp);
+    }
 
-      return value;
-    },
-    set: (newValue) => {
-      if (newValue === value) return;
-      value = newValue;
-
-      for (const subscriber of subscribers) {
-        subscriber();
-      }
-    },
+    return value;
   }
+
+  const set = (newValue) => {
+    if (newValue === value) return;
+    value = newValue;
+
+    for (const subscriber of subscribers) {
+      subscriber();
+    }
+  }
+
+  const impl = get;
+  impl.set = set;
+
+  return impl;
 }
 
 export const computed = (computation) => {
@@ -41,34 +45,32 @@ export const computed = (computation) => {
     }
   };
 
-  return {
-    get: () => {
-      if (signalsSystem.currentSubscriber) {
-        const temp = signalsSystem.currentSubscriber.notify;
-        signalsSystem.currentSubscriber.addDependency(() => subscribers.delete(temp));
-        subscribers.add(temp);
-      }
+  return () => {
+    if (signalsSystem.currentSubscriber) {
+      const temp = signalsSystem.currentSubscriber.notify;
+      signalsSystem.currentSubscriber.addDependency(() => subscribers.delete(temp));
+      subscribers.add(temp);
+    }
 
-      if (!stale) {
-        return cachedValue;
-      }
-
-      for (const removeNotifySubscription of dependencies) {
-        removeNotifySubscription(markAsStale);
-      }
-      dependencies.clear();
-
-      const prev = signalsSystem.currentSubscriber;
-      signalsSystem.currentSubscriber = {
-        notify: markAsStale,
-        addDependency: (removeDependencyFn) => dependencies.add(removeDependencyFn),
-      };
-      cachedValue = computation();
-      stale = false;
-      signalsSystem.currentSubscriber = prev;
-
+    if (!stale) {
       return cachedValue;
-    },
+    }
+
+    for (const removeNotifySubscription of dependencies) {
+      removeNotifySubscription(markAsStale);
+    }
+    dependencies.clear();
+
+    const prev = signalsSystem.currentSubscriber;
+    signalsSystem.currentSubscriber = {
+      notify: markAsStale,
+      addDependency: (removeDependencyFn) => dependencies.add(removeDependencyFn),
+    };
+    cachedValue = computation();
+    stale = false;
+    signalsSystem.currentSubscriber = prev;
+
+    return cachedValue;
   }
 }
 

@@ -1,4 +1,4 @@
-import { signalsSystem } from './04.auto-subscribe.js';
+import { signalsSystem } from './05.auto-subscribe.js';
 
 export const effect = (effectFn) => {
   const runEffect = () => {

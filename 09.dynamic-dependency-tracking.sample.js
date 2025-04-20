@@ -1,4 +1,4 @@
-import { computed, effect, signal } from './08.dynamic-dependency-tracking.js';
+import { computed, effect, signal } from './09.dynamic-dependency-tracking.js';
 
 console.log('Dynamic dependency tracking');
 const reactiveVariable1 = signal('var-1 [0]');
@@ -7,12 +7,12 @@ const reactiveVariable2 = signal('var-2 [0]');
 const shouldUse1 = signal(true);
 
 const reactiveConditionalComputed = computed(() => {
-  const value = shouldUse1.get() ? reactiveVariable1.get() : reactiveVariable2.get();
+  const value = shouldUse1() ? reactiveVariable1() : reactiveVariable2();
   return `Computed value: ${value}`;
 });
 
 effect(() =>
-  console.log(reactiveConditionalComputed.get()),
+  console.log(reactiveConditionalComputed()),
 );
 
 shouldUse1.set(false);

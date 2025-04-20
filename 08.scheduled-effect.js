@@ -6,23 +6,27 @@ export const signal = (initialValue) => {
   let value = initialValue;
   const subscribers = new Set();
 
-  return {
-    get: () => {
-      if (signalsSystem.currentSubscriber) {
-        subscribers.add(signalsSystem.currentSubscriber);
-      }
+  const get = () => {
+    if (signalsSystem.currentSubscriber) {
+      subscribers.add(signalsSystem.currentSubscriber);
+    }
 
-      return value;
-    },
-    set: (newValue) => {
-      if (newValue === value) return;
-      value = newValue;
-
-      for (const subscriber of subscribers) {
-        subscriber();
-      }
-    },
+    return value;
   }
+
+  const set = (newValue) => {
+    if (newValue === value) return;
+    value = newValue;
+
+    for (const subscriber of subscribers) {
+      subscriber();
+    }
+  }
+
+  const impl = get;
+  impl.set = set;
+
+  return impl;
 }
 
 export const computed = (computation) => {
@@ -38,24 +42,22 @@ export const computed = (computation) => {
     }
   };
 
-  return {
-    get: () => {
-      if (signalsSystem.currentSubscriber) {
-        subscribers.add(signalsSystem.currentSubscriber);
-      }
+  return () => {
+    if (signalsSystem.currentSubscriber) {
+      subscribers.add(signalsSystem.currentSubscriber);
+    }
 
-      if (!stale) {
-        return cachedValue;
-      }
-
-      const prev = signalsSystem.currentSubscriber;
-      signalsSystem.currentSubscriber = markAsStale;
-      cachedValue = computation();
-      stale = false;
-      signalsSystem.currentSubscriber = prev;
-
+    if (!stale) {
       return cachedValue;
-    },
+    }
+
+    const prev = signalsSystem.currentSubscriber;
+    signalsSystem.currentSubscriber = markAsStale;
+    cachedValue = computation();
+    stale = false;
+    signalsSystem.currentSubscriber = prev;
+
+    return cachedValue;
   }
 }
 

@@ -12,10 +12,13 @@ export const computed = (computation, dependencies) => {
     });
   }
 
-  return {
-    get: () => cachedValue,
-    subscribe: (subscriber) => {
-      subscribers.add(subscriber);
-    },
-  }
+  const get = () => cachedValue;
+  const subscribe = (subscriber) => {
+    subscribers.add(subscriber);
+  };
+
+  const impl = get;
+  impl.subscribe = subscribe;
+
+  return impl;
 }

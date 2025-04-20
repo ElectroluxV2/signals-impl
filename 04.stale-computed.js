@@ -12,19 +12,23 @@ export const computed = (computation, dependencies) => {
     });
   }
 
-  return {
-    get: () => {
-      if (!stale) {
-        return cachedValue;
-      }
-
-      cachedValue = computation();
-      stale = false;
-
+  const get = () => {
+    if (!stale) {
       return cachedValue;
-    },
-    subscribe: (subscriber) => {
-      subscribers.add(subscriber);
-    },
+    }
+
+    cachedValue = computation();
+    stale = false;
+
+    return cachedValue;
   }
+
+  const subscribe = (subscriber) => {
+    subscribers.add(subscriber);
+  }
+
+  const impl = get;
+  impl.subscribe = subscribe;
+
+  return impl;
 }

@@ -9,23 +9,27 @@ export const signal = (initialValue) => {
   let value = initialValue;
   const subscribers = new Map();
 
-  return {
-    get: () => {
-      if (signalsSystem.currentSubscriber) {
-        subscribers.set(signalsSystem.currentSubscriber, signalsSystem.currentType);
-      }
+  const get = () => {
+    if (signalsSystem.currentSubscriber) {
+      subscribers.set(signalsSystem.currentSubscriber, signalsSystem.currentType);
+    }
 
-      return value;
-    },
-    set: (newValue) => {
-      if (newValue === value) return;
-      value = newValue;
-
-      for (const [subscriber] of sortByType(subscribers)) {
-        subscriber();
-      }
-    },
+    return value;
   }
+
+  const set = (newValue) => {
+    if (newValue === value) return;
+    value = newValue;
+
+    for (const [subscriber] of sortByType(subscribers)) {
+      subscriber();
+    }
+  }
+
+  const impl = get;
+  impl.set = set;
+
+  return impl;
 }
 
 export const computed = (computation) => {
@@ -41,27 +45,25 @@ export const computed = (computation) => {
     }
   };
 
-  return {
-    get: () => {
-      if (signalsSystem.currentSubscriber) {
-        subscribers.set(signalsSystem.currentSubscriber, signalsSystem.currentType);
-      }
+  return () => {
+    if (signalsSystem.currentSubscriber) {
+      subscribers.set(signalsSystem.currentSubscriber, signalsSystem.currentType);
+    }
 
-      if (!stale) {
-        return cachedValue;
-      }
-
-      const prev = signalsSystem.currentSubscriber;
-      const prevType = signalsSystem.currentType;
-      signalsSystem.currentSubscriber = markAsStale;
-      signalsSystem.currentType = 1;
-      cachedValue = computation();
-      stale = false;
-      signalsSystem.currentSubscriber = prev;
-      signalsSystem.currentType = prevType;
-
+    if (!stale) {
       return cachedValue;
-    },
+    }
+
+    const prev = signalsSystem.currentSubscriber;
+    const prevType = signalsSystem.currentType;
+    signalsSystem.currentSubscriber = markAsStale;
+    signalsSystem.currentType = 1;
+    cachedValue = computation();
+    stale = false;
+    signalsSystem.currentSubscriber = prev;
+    signalsSystem.currentType = prevType;
+
+    return cachedValue;
   }
 }
 
