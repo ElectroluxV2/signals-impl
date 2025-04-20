@@ -1,4 +1,4 @@
-import { computed, effect, signal } from './07.dynamic-dependency-tracking.js';
+import { computed, effect, signal } from './08.dynamic-dependency-tracking.js';
 
 console.log('Dynamic dependency tracking');
 const reactiveVariable1 = signal('var-1 [0]');

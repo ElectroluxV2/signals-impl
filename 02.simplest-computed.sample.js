@@ -1,5 +1,5 @@
 import { signal } from './00.simplest-signal.js';
-import { computed } from './01.simplest-computed.js';
+import { computed } from './02.simplest-computed.js';
 
 const reactiveNumber = signal(1);
 const reactiveParity = computed(

@@ -1,6 +1,6 @@
 import { signal } from './00.simplest-signal.js';
-import { computed as eagerComputed } from './01.simplest-computed.js';
-import { computed as lazyComputed } from './02.stale-computed.js';
+import { computed as eagerComputed } from './02.simplest-computed.js';
+import { computed as lazyComputed } from './03.stale-computed.js';
 
 const reactiveNumber = signal(1);
 const reactiveParityEager = eagerComputed(

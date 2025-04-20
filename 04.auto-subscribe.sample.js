@@ -1,4 +1,4 @@
-import { computed, signal } from './03.auto-subscribe.js';
+import { computed, signal } from './04.auto-subscribe.js';
 
 const reactiveNumber = signal(1);
 const reactiveParity = computed(() => reactiveNumber.get() % 2 === 0 ? 'even' : 'odd');

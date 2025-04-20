@@ -18,6 +18,7 @@ export const signal = (initialValue) => {
       return value;
     },
     set: (newValue) => {
+      if (newValue === value) return;
       value = newValue;
 
       for (const [subscriber] of sortByType(subscribers)) {
