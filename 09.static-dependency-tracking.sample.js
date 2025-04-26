@@ -1,4 +1,5 @@
-import { computed, effect, signal } from './08.scheduled-effect.js';
+import { signal, computed } from './05.auto-subscribe.js';
+import { effect } from './08.scheduled-effect.js';
 
 console.log('Static dependency tracking');
 const reactiveVariable1 = signal('var-1 [0]');

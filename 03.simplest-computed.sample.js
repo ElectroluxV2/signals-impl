@@ -1,4 +1,4 @@
-import { signal } from './01.neat-syntax.js';
+import { signal } from './02.same-value.js';
 import { computed } from './03.simplest-computed.js';
 
 const reactiveNumber = signal(1);
